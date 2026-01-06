@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Job Portal{% endblock %}</title>
+    <meta name="description" content="Find your dream job with Job Portal. Connect with top companies and discover opportunities that match your skills.">
+    <meta name="keywords" content="jobs, careers, employment, job search, hiring, recruitment">
+    <link rel="icon" type="image/x-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💼</text></svg>">
+    <link href="https://cdn.jsdelivr.net/npm/lucide-static/font/lucide.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/output.css') }}">
+    <script src="{{ url_for('static', filename='js/main.js') }}" defer></script>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <a href="{{ url_for('index') }}" class="logo">
+                <i class="icon-briefcase"></i>
+                <span>JobPortal</span>
+            </a>
+            
+            <div class="nav-links">
+                <a href="{{ url_for('jobs') }}" class="nav-link">
+                    <i class="icon-search"></i>
+                    Find Jobs
+                </a>
+                
+                {% if current_user.is_authenticated %}
+                    <a href="{{ url_for('dashboard') }}" class="nav-link">
+                        <i class="icon-layout-dashboard"></i>
+                        Dashboard
+                    </a>
+                    
+                    {% if current_user.role == 'job_seeker' %}
+                    <a href="{{ url_for('my_applications') }}" class="nav-link">
+                        <i class="icon-file-text"></i>
+                        My Applications
+                    </a>
+                    <a href="{{ url_for('saved_jobs') }}" class="nav-link">
+                        <i class="icon-bookmark"></i>
+                        Saved Jobs
+                    </a>
+                    {% endif %}
+                    
+                    <div class="user-menu">
+                        <button class="user-button" onclick="toggleUserMenu()">
+                            <i class="icon-user"></i>
+                            <span>{{ current_user.full_name or current_user.username }}</span>
+                            <i class="icon-chevron-down"></i>
+                        </button>
+                        <div class="user-dropdown" id="userDropdown">
+                            <div style="padding: var(--spacing-sm) var(--spacing-md); border-bottom: 1px solid var(--color-border);">
+                                <p style="font-weight: 600; margin-bottom: 0.125rem;">{{ current_user.full_name or current_user.username }}</p>
+                                <p class="text-muted" style="font-size: 0.8125rem;">{{ current_user.role.replace('_', ' ').title() }}</p>
+                            </div>
+                            <a href="{{ url_for('logout') }}" class="dropdown-item">
+                                <i class="icon-log-out"></i>
+                                Logout
+                            </a>
+                        </div>
+                    </div>
+                {% else %}
+                    <a href="{{ url_for('login') }}" class="nav-link">Login</a>
+                    <a href="{{ url_for('register') }}" class="btn-primary">Get Started</a>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="flash-container">
+                {% for category, message in messages %}
+                    <div class="flash flash-{{ category }}">
+                        <span>{{ message }}</span>
+                        <button onclick="this.parentElement.remove()" class="flash-close">
+                            <i class="icon-x"></i>
+                        </button>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>JobPortal</h3>
+                    <p class="text-muted">Connect talented professionals with amazing opportunities</p>
+                </div>
+                <div class="footer-section">
+                    <h4>For Job Seekers</h4>
+                    <a href="{{ url_for('jobs') }}">Browse Jobs</a>
+                    <a href="{{ url_for('register') }}">Create Account</a>
+                </div>
+                <div class="footer-section">
+                    <h4>For Recruiters</h4>
+                    <a href="{{ url_for('register') }}">Post Jobs</a>
+                    <a href="{{ url_for('login') }}">Recruiter Login</a>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 JobPortal. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        function toggleUserMenu() {
+            const dropdown = document.getElementById('userDropdown');
+            dropdown.classList.toggle('show');
+        }
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(event) {
+            const userMenu = document.querySelector('.user-menu');
+            if (userMenu && !userMenu.contains(event.target)) {
+                document.getElementById('userDropdown').classList.remove('show');
+            }
+        });
+    </script>
+</body>
+</html>

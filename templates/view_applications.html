@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+
+{% block title %}Applications for {{ job.title }} - Job Portal{% endblock %}
+
+{% block content %}
+<div class="container" style="margin-top: 2rem;">
+    <div class="page-breadcrumb">
+        <a href="{{ url_for('recruiter_dashboard') }}">Dashboard</a> / 
+        <span>{{ job.title }}</span>
+    </div>
+
+    <div class="applications-header">
+        <div>
+            <h1>Applications for {{ job.title }}</h1>
+            <p class="text-muted">{{ applications|length }} total applications</p>
+        </div>
+        <a href="{{ url_for('job_detail', job_id=job.id) }}" class="btn-secondary">View Job Posting</a>
+    </div>
+
+    {% if applications %}
+    <div class="applications-table">
+        {% for application in applications %}
+        <div class="application-item">
+            <div class="application-info">
+                <div class="applicant-header">
+                    <div class="applicant-avatar">
+                        <i class="icon-user"></i>
+                    </div>
+                    <div>
+                        <h3 class="applicant-name">{{ application.applicant.full_name or application.applicant.username }}</h3>
+                        <p class="applicant-email">{{ application.applicant.email }}</p>
+                    </div>
+                </div>
+                
+                <div class="application-details">
+                    <div class="detail-item">
+                        <span class="detail-label">Applied:</span>
+                        <span>{{ application.applied_at.strftime('%B %d, %Y at %I:%M %p') }}</span>
+                    </div>
+                    {% if application.applicant.phone %}
+                    <div class="detail-item">
+                        <span class="detail-label">Phone:</span>
+                        <span>{{ application.applicant.phone }}</span>
+                    </div>
+                    {% endif %}
+                </div>
+
+                {% if application.cover_letter %}
+                <div class="cover-letter">
+                    <h4>Cover Letter</h4>
+                    <p>{{ application.cover_letter }}</p>
+                </div>
+                {% endif %}
+            </div>
+
+            <div class="application-status-actions">
+                <form method="POST" action="{{ url_for('update_application_status', application_id=application.id) }}">
+                    <label class="form-label">Status:</label>
+                    <select name="status" class="form-input form-input-sm" onchange="this.form.submit()">
+                        <option value="pending" {% if application.status == 'pending' %}selected{% endif %}>Pending</option>
+                        <option value="reviewed" {% if application.status == 'reviewed' %}selected{% endif %}>Reviewed</option>
+                        <option value="accepted" {% if application.status == 'accepted' %}selected{% endif %}>Accepted</option>
+                        <option value="rejected" {% if application.status == 'rejected' %}selected{% endif %}>Rejected</option>
+                    </select>
+                </form>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty-state">
+        <i class="icon-user"></i>
+        <p>No applications received yet</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

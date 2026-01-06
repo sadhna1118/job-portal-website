@@ -1,0 +1,167 @@
+{% extends "base.html" %}
+
+{% block title %}{{ job.title }} - Job Portal{% endblock %}
+
+{% block content %}
+<div class="container" style="margin-top: 2rem;">
+    <div class="job-detail-container">
+        <div class="job-detail-main">
+            <div class="job-detail-header">
+                <h1 class="job-detail-title">{{ job.title }}</h1>
+                <span class="job-type-badge">{{ job.job_type or 'Full-time' }}</span>
+            </div>
+            
+            <div class="job-detail-company">
+                <h2>{{ job.company }}</h2>
+                <div class="job-meta">
+                    <span class="meta-item">
+                        <i class="icon-map-pin"></i>
+                        {{ job.location }}
+                    </span>
+                    {% if job.experience %}
+                    <span class="meta-item">
+                        {{ job.experience }}
+                    </span>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="job-section">
+                <h3 class="section-heading">Job Description</h3>
+                <p class="job-detail-text">{{ job.description }}</p>
+            </div>
+
+            {% if job.requirements %}
+            <div class="job-section">
+                <h3 class="section-heading">Requirements</h3>
+                <p class="job-detail-text">{{ job.requirements }}</p>
+            </div>
+            {% endif %}
+
+            {% if job.skills %}
+            <div class="job-section">
+                <h3 class="section-heading">Required Skills</h3>
+                <div class="skills-tags">
+                    {% for skill in job.skills.split(',') %}
+                    <span class="skill-tag">{{ skill.strip() }}</span>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+
+        <div class="job-detail-sidebar">
+            <div class="sidebar-card">
+                {% if job.salary %}
+                <div class="sidebar-item">
+                    <span class="sidebar-label">Salary</span>
+                    <span class="sidebar-value">{{ job.salary }}</span>
+                </div>
+                {% endif %}
+                
+                <div class="sidebar-item">
+                    <span class="sidebar-label">Job Type</span>
+                    <span class="sidebar-value">{{ job.job_type or 'Full-time' }}</span>
+                </div>
+
+                {% if job.experience %}
+                <div class="sidebar-item">
+                    <span class="sidebar-label">Experience</span>
+                    <span class="sidebar-value">{{ job.experience }}</span>
+                </div>
+                {% endif %}
+
+                <div class="sidebar-item">
+                    <span class="sidebar-label">Posted</span>
+                    <span class="sidebar-value">{{ job.created_at.strftime('%B %d, %Y') }}</span>
+                </div>
+
+                {% if current_user.is_authenticated and current_user.role == 'job_seeker' %}
+                    {% if has_applied %}
+                        <button class="btn-secondary btn-full" disabled>
+                            <i class="icon-check"></i>
+                            Already Applied
+                        </button>
+                    {% else %}
+                        <a href="{{ url_for('apply_job', job_id=job.id) }}" class="btn-primary btn-full">
+                            <i class="icon-send"></i>
+                            Apply Now
+                        </a>
+                    {% endif %}
+                    
+                    <button onclick="toggleSaveJob({{ job.id }})" id="save-btn-{{ job.id }}" 
+                            class="btn-secondary btn-full" style="margin-top: var(--spacing-sm);">
+                        <i class="{% if is_saved %}icon-bookmark-check{% else %}icon-bookmark{% endif %}" id="save-icon-{{ job.id }}"></i>
+                        <span id="save-text-{{ job.id }}">{% if is_saved %}Saved{% else %}Save Job{% endif %}</span>
+                    </button>
+                {% elif not current_user.is_authenticated %}
+                    <a href="{{ url_for('login') }}" class="btn-primary btn-full">
+                        <i class="icon-log-in"></i>
+                        Login to Apply
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    {% if similar_jobs %}
+    <div style="margin-top: var(--spacing-2xl); padding-top: var(--spacing-2xl); border-top: 1px solid var(--color-border);">
+        <h2 style="font-size: 1.5rem; margin-bottom: var(--spacing-lg);">Similar Jobs</h2>
+        <div class="jobs-grid">
+            {% for similar_job in similar_jobs %}
+            <div class="job-card">
+                <div class="job-card-header">
+                    <h3 class="job-title">{{ similar_job.title }}</h3>
+                    <span class="job-type-badge">{{ similar_job.job_type or 'Full-time' }}</span>
+                </div>
+                <p class="job-company">{{ similar_job.company }}</p>
+                <div class="job-meta">
+                    <span class="meta-item">
+                        <i class="icon-map-pin"></i>
+                        {{ similar_job.location }}
+                    </span>
+                    {% if similar_job.salary %}
+                    <span class="meta-item">
+                        <i class="icon-dollar-sign"></i>
+                        {{ similar_job.salary }}
+                    </span>
+                    {% endif %}
+                </div>
+                <a href="{{ url_for('job_detail', job_id=similar_job.id) }}" class="btn-secondary btn-full">View Details</a>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<script>
+function toggleSaveJob(jobId) {
+    fetch(`/job/${jobId}/save`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest'
+        },
+        credentials: 'same-origin'
+    })
+    .then(response => response.json())
+    .then(data => {
+        const icon = document.getElementById(`save-icon-${jobId}`);
+        const text = document.getElementById(`save-text-${jobId}`);
+        
+        if (data.saved) {
+            icon.className = 'icon-bookmark-check';
+            text.textContent = 'Saved';
+        } else {
+            icon.className = 'icon-bookmark';
+            text.textContent = 'Save Job';
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('An error occurred. Please try again.');
+    });
+}
+</script>
+{% endblock %}

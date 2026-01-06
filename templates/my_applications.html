@@ -1,0 +1,126 @@
+{% extends "base.html" %}
+
+{% block title %}My Applications - Job Portal{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div class="container">
+        <h1 class="page-title">My Applications</h1>
+        <p class="page-subtitle">Track your job applications and their status</p>
+    </div>
+</div>
+
+<div class="container" style="margin-top: 2rem;">
+    <!-- Application Status Filters -->
+    <div style="background: var(--color-bg); border: 1px solid var(--color-border); border-radius: var(--radius-lg); padding: var(--spacing-lg); margin-bottom: var(--spacing-xl); display: flex; flex-wrap: wrap; gap: var(--spacing-sm);">
+        <a href="{{ url_for('my_applications') }}" 
+           class="{% if current_status == 'all' %}btn-primary{% else %}btn-secondary{% endif %} btn-sm">
+            All ({{ status_counts.all }})
+        </a>
+        <a href="{{ url_for('my_applications', status='pending') }}" 
+           class="{% if current_status == 'pending' %}btn-primary{% else %}btn-secondary{% endif %} btn-sm">
+            Pending ({{ status_counts.pending }})
+        </a>
+        <a href="{{ url_for('my_applications', status='reviewed') }}" 
+           class="{% if current_status == 'reviewed' %}btn-primary{% else %}btn-secondary{% endif %} btn-sm">
+            In Review ({{ status_counts.reviewed }})
+        </a>
+        <a href="{{ url_for('my_applications', status='accepted') }}" 
+           class="{% if current_status == 'accepted' %}btn-primary{% else %}btn-secondary{% endif %} btn-sm">
+            Accepted ({{ status_counts.accepted }})
+        </a>
+        <a href="{{ url_for('my_applications', status='rejected') }}" 
+           class="{% if current_status == 'rejected' %}btn-primary{% else %}btn-secondary{% endif %} btn-sm">
+            Rejected ({{ status_counts.rejected }})
+        </a>
+    </div>
+
+    {% if applications_pagination.items %}
+    <div class="applications-list">
+        {% for application in applications_pagination.items %}
+        {% set job = application.job %}
+        <div class="application-card">
+            <div class="application-header">
+                <div>
+                    <h3 class="application-title">
+                        <a href="{{ url_for('job_detail', job_id=job.id) }}" class="link">
+                            {{ job.title }}
+                        </a>
+                    </h3>
+                    <p class="application-company">{{ job.company }}</p>
+                </div>
+                <span class="status-badge status-{{ application.status }}">
+                    {{ application.status|title }}
+                </span>
+            </div>
+            
+            <div class="application-meta">
+                <span class="meta-item">
+                    <i class="icon-map-pin"></i>
+                    {{ job.location }}
+                </span>
+                
+                <span class="meta-item">
+                    <i class="icon-calendar"></i>
+                    Applied on {{ application.applied_at.strftime('%b %d, %Y') }}
+                </span>
+                
+                {% if application.updated_at != application.applied_at %}
+                <span class="meta-item">
+                    <i class="icon-clock"></i>
+                    Updated {{ application.updated_at.strftime('%b %d, %Y') }}
+                </span>
+                {% endif %}
+            </div>
+            
+            {% if application.cover_letter %}
+            <div style="margin-top: var(--spacing-md); padding-top: var(--spacing-md); border-top: 1px solid var(--color-border);">
+                <h4 style="font-size: 0.875rem; font-weight: 600; margin-bottom: var(--spacing-xs);">Your Cover Letter</h4>
+                <p class="text-muted" style="font-size: 0.875rem;">{{ application.cover_letter|truncate(200) }}</p>
+            </div>
+            {% endif %}
+            
+            <div style="margin-top: var(--spacing-md);">
+                <a href="{{ url_for('job_detail', job_id=job.id) }}" class="btn-secondary btn-sm">
+                    View Job
+                    <i class="icon-arrow-right"></i>
+                </a>
+            </div>
+        </div>
+        {% endfor %}
+        
+        <!-- Pagination -->
+        {% if applications_pagination.pages > 1 %}
+        <div style="margin-top: 2rem; display: flex; justify-content: center; gap: var(--spacing-sm); align-items: center;">
+            {% if applications_pagination.has_prev %}
+            <a href="{{ url_for('my_applications', page=applications_pagination.prev_num, status=current_status) }}" 
+               class="btn-secondary">
+                <i class="icon-chevron-left"></i>
+                Previous
+            </a>
+            {% endif %}
+            
+            <span class="text-muted">
+                Page {{ applications_pagination.page }} of {{ applications_pagination.pages }}
+            </span>
+            
+            {% if applications_pagination.has_next %}
+            <a href="{{ url_for('my_applications', page=applications_pagination.next_num, status=current_status) }}" 
+               class="btn-secondary">
+                Next
+                <i class="icon-chevron-right"></i>
+            </a>
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+    {% else %}
+    <div class="empty-state">
+        <i class="icon-file-text"></i>
+        <h3>No applications found</h3>
+        <p>You haven't applied to any jobs yet.</p>
+        <a href="{{ url_for('jobs') }}" class="btn-primary">Browse Jobs</a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

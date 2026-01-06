@@ -1,0 +1,157 @@
+{% extends "base.html" %}
+
+{% block title %}Browse Jobs - Job Portal{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div class="container">
+        <h1 class="page-title">Find Your Dream Job</h1>
+        <p class="page-subtitle">Browse through thousands of job listings and find the perfect match for your skills</p>
+    </div>
+</div>
+
+<div class="container" style="margin-top: 2rem;">
+    <div class="search-filters">
+        <form action="{{ url_for('jobs') }}" method="get" class="filter-form">
+            <!-- Main Search Row -->
+            <div class="filter-group" style="flex: 2; min-width: 250px;">
+                <i class="icon-search"></i>
+                <input type="text" name="search" value="{{ search }}" 
+                       class="filter-input" 
+                       placeholder="Job title, company, or keywords">
+            </div>
+            
+            <div class="filter-group" style="flex: 1.5; min-width: 200px;">
+                <i class="icon-map-pin"></i>
+                <input type="text" name="location" value="{{ location }}" 
+                       class="filter-input" 
+                       placeholder="Location">
+            </div>
+            
+            <button type="submit" class="btn-primary">Search Jobs</button>
+        </form>
+        
+        <!-- Advanced Filters -->
+        <form action="{{ url_for('jobs') }}" method="get" class="filter-form" style="margin-top: var(--spacing-md); padding-top: var(--spacing-md); border-top: 1px solid var(--color-border);">
+            <input type="hidden" name="search" value="{{ search }}">
+            <input type="hidden" name="location" value="{{ location }}">
+            
+            <div class="form-group" style="flex: 1; min-width: 200px;">
+                <label class="form-label">Job Type</label>
+                <select name="type" class="form-input form-input-sm">
+                    <option value="all" {% if not selected_type or selected_type == 'all' %}selected{% endif %}>All Job Types</option>
+                    {% for type in job_types %}
+                        <option value="{{ type }}" {% if selected_type == type %}selected{% endif %}>{{ type|title }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            
+            <div class="form-group" style="flex: 1; min-width: 200px;">
+                <label class="form-label">Experience Level</label>
+                <select name="experience" class="form-input form-input-sm">
+                    <option value="all" {% if not selected_experience or selected_experience == 'all' %}selected{% endif %}>All Experience Levels</option>
+                    {% for level in experience_levels %}
+                        <option value="{{ level }}" {% if selected_experience == level %}selected{% endif %}>{{ level }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            
+            <button type="submit" class="btn-secondary" style="margin-top: 1.5rem;">Apply Filters</button>
+        </form>
+    </div>
+
+    {% if jobs %}
+    <div class="jobs-list">
+        {% for job in jobs %}
+        <div class="job-list-item">
+            <div class="job-list-content">
+                <div class="job-list-header">
+                    <h3 class="job-list-title">{{ job.title }}</h3>
+                    <span class="job-type-badge">{{ job.job_type or 'Full-time' }}</span>
+                </div>
+                <p class="job-list-company">{{ job.company }}</p>
+                
+                <div class="job-meta">
+                    <span class="meta-item">
+                        <i class="icon-map-pin"></i>
+                        {{ job.location }}
+                    </span>
+                    
+                    {% if job.experience %}
+                    <span class="meta-item">
+                        <i class="icon-briefcase"></i>
+                        {{ job.experience }}
+                    </span>
+                    {% endif %}
+                    
+                    {% if job.salary %}
+                    <span class="meta-item">
+                        <i class="icon-dollar-sign"></i>
+                        {{ job.salary }}
+                    </span>
+                    {% endif %}
+                    
+                    <span class="meta-item">
+                        <i class="icon-calendar"></i>
+                        Posted {{ job.created_at.strftime('%b %d, %Y') }}
+                    </span>
+                </div>
+                
+                {% if job.skills %}
+                <div class="skills-tags">
+                    {% for skill in job.skills.split(',')[:5] %}
+                    <span class="skill-tag">{{ skill.strip() }}</span>
+                    {% endfor %}
+                </div>
+                {% endif %}
+                
+                {% if job.description %}
+                <p class="job-description" style="margin-top: var(--spacing-md);">{{ job.description|truncate(200) }}</p>
+                {% endif %}
+            </div>
+            
+            <div class="job-list-actions">
+                <a href="{{ url_for('job_detail', job_id=job.id) }}" class="btn-primary">
+                    View Details
+                    <i class="icon-arrow-right"></i>
+                </a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    
+    <!-- Pagination -->
+    {% if jobs_pagination.pages > 1 %}
+    <div style="margin-top: 2rem; display: flex; justify-content: center; gap: var(--spacing-sm);">
+        {% if jobs_pagination.has_prev %}
+        <a href="{{ url_for('jobs', page=jobs_pagination.prev_num, search=search, location=location, type=selected_type, experience=selected_experience) }}" 
+           class="btn-secondary">
+            <i class="icon-chevron-left"></i>
+            Previous
+        </a>
+        {% endif %}
+        
+        <span class="btn-secondary" style="pointer-events: none;">
+            Page {{ jobs_pagination.page }} of {{ jobs_pagination.pages }}
+        </span>
+        
+        {% if jobs_pagination.has_next %}
+        <a href="{{ url_for('jobs', page=jobs_pagination.next_num, search=search, location=location, type=selected_type, experience=selected_experience) }}" 
+           class="btn-secondary">
+            Next
+            <i class="icon-chevron-right"></i>
+        </a>
+        {% endif %}
+    </div>
+    {% endif %}
+    
+    {% else %}
+    <div class="empty-state">
+        <i class="icon-search"></i>
+        <h3>No jobs found</h3>
+        <p>Try adjusting your search or filter to find what you're looking for.</p>
+        <a href="{{ url_for('jobs') }}" class="btn-primary">Clear all filters</a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

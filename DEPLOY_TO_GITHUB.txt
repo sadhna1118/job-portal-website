@@ -1,0 +1,115 @@
+===============================================
+   JOB PORTAL - DEPLOY TO GITHUB
+   Admin/Owner: Sadhna
+===============================================
+
+READY TO DEPLOY! ✅
+
+Admin name has been updated to "Sadhna" in:
+✅ app.py (line 562)
+✅ seed_data.py (will update on next seeding)
+✅ README.md (demo accounts table)
+
+===============================================
+QUICK DEPLOY STEPS
+===============================================
+
+1. Open PowerShell in this folder
+
+2. Run these commands ONE BY ONE:
+
+git init
+git add .
+git commit -m "Initial commit: Job Portal by Sadhna"
+
+3. Go to GitHub.com and create new repository:
+   - Name: job-portal-web
+   - Public or Private (your choice)
+   - DON'T initialize with README
+   - Click "Create repository"
+
+4. Copy the commands GitHub shows you, OR run:
+
+git remote add origin https://github.com/YOUR_USERNAME/job-portal-web.git
+git branch -M main
+git push -u origin main
+
+(Replace YOUR_USERNAME with your actual GitHub username)
+
+5. When asked for password, use Personal Access Token:
+   GitHub.com → Settings → Developer settings
+   → Personal access tokens → Generate new token
+   → Check "repo" → Generate → Copy the token
+   → Use as password
+
+===============================================
+DEPLOY LIVE (Optional)
+===============================================
+
+After pushing to GitHub, deploy live on Render:
+
+1. Go to render.com
+2. Sign up with GitHub
+3. New → Web Service
+4. Select your repo
+5. Build: pip install -r requirements.txt && npm install && npm run build:css
+6. Start: gunicorn app:app
+7. Environment: Add SECRET_KEY variable
+8. Create Web Service
+
+Your app will be live in 5-10 minutes!
+
+===============================================
+FILES CREATED FOR YOU
+===============================================
+
+✅ .env.example - Template for environment variables
+✅ .gitignore - Already configured to exclude sensitive files
+✅ GITHUB_DEPLOYMENT.md - Complete deployment guide
+✅ QUICK_START_GITHUB.md - Quick reference
+✅ Procfile - For Heroku/Render deployment
+✅ runtime.txt - Python version for deployment
+
+===============================================
+IMPORTANT NOTES
+===============================================
+
+⚠️ Change these passwords in PRODUCTION:
+   - Admin (Sadhna): admin123 → [strong password]
+   - Recruiters: recruiter123 → [strong password]
+   - Job Seekers: seeker123 → [strong password]
+
+⚠️ Never commit to GitHub:
+   - instance/jobportal.db (already in .gitignore)
+   - .env files with passwords (already in .gitignore)
+   - uploads/ folder (already in .gitignore)
+
+✅ Safe to commit:
+   - .env.example (no real passwords)
+   - All code files
+   - Static files (CSS, JS)
+   - Templates
+
+===============================================
+ADMIN LOGIN CREDENTIALS
+===============================================
+
+Email: admin@jobportal.com
+Password: admin123
+Name: Sadhna
+
+⚠️ CHANGE PASSWORD AFTER DEPLOYING TO PRODUCTION!
+
+===============================================
+NEED HELP?
+===============================================
+
+Read these files:
+- QUICK_START_GITHUB.md (fastest way)
+- GITHUB_DEPLOYMENT.md (complete guide)
+- DEPLOYMENT_GUIDE.md (production deployment)
+
+===============================================
+
+Good luck with your deployment! 🚀
+Project Owner: Sadhna

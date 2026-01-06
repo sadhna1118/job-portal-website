@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+
+{% block title %}Recruiter Dashboard - Job Portal{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+    <div class="dashboard-header">
+        <div class="container">
+            <h1>Recruiter Dashboard</h1>
+            <p class="text-muted">Manage your job postings and review applications</p>
+        </div>
+    </div>
+
+    <div class="container" style="margin-top: 2rem;">
+        <div class="dashboard-actions">
+            <a href="{{ url_for('post_job') }}" class="btn-primary">
+                <i class="icon-plus"></i>
+                Post New Job
+            </a>
+        </div>
+
+        <h2 class="dashboard-section-title">My Job Postings</h2>
+
+        {% if jobs %}
+        <div class="jobs-table">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Job Title</th>
+                        <th>Location</th>
+                        <th>Applications</th>
+                        <th>Status</th>
+                        <th>Posted Date</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for job in jobs %}
+                    <tr>
+                        <td>
+                            <div class="table-cell-title">{{ job.title }}</div>
+                            <div class="table-cell-subtitle">{{ job.company }}</div>
+                        </td>
+                        <td>{{ job.location }}</td>
+                        <td>
+                            <a href="{{ url_for('view_applications', job_id=job.id) }}" class="link">
+                                {{ job.applications|length }} applications
+                            </a>
+                        </td>
+                        <td>
+                            <span class="status-badge status-{{ job.status }}">
+                                {{ job.status.title() }}
+                            </span>
+                        </td>
+                        <td>{{ job.created_at.strftime('%b %d, %Y') }}</td>
+                        <td>
+                            <div class="table-actions">
+                                <a href="{{ url_for('job_detail', job_id=job.id) }}" class="action-btn" title="View">
+                                    <i class="icon-eye"></i>
+                                </a>
+                                <a href="{{ url_for('edit_job', job_id=job.id) }}" class="action-btn" title="Edit">
+                                    <i class="icon-pencil"></i>
+                                </a>
+                                <form method="POST" action="{{ url_for('delete_job', job_id=job.id) }}" style="display: inline;" 
+                                    onsubmit="return confirm('Are you sure you want to delete this job?')">
+                                    <button type="submit" class="action-btn action-btn-danger" title="Delete">
+                                        <i class="icon-trash"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <i class="icon-briefcase"></i>
+            <p>You haven't posted any jobs yet</p>
+            <a href="{{ url_for('post_job') }}" class="btn-primary">Post Your First Job</a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block title %}Manage Users - Admin{% endblock %}
+
+{% block content %}
+<div class="container" style="margin-top: 2rem;">
+    <div class="page-breadcrumb">
+        <a href="{{ url_for('admin_dashboard') }}">Admin Dashboard</a> / 
+        <span>Users</span>
+    </div>
+
+    <h1 class="page-title">Manage Users</h1>
+
+    <div class="data-table-container">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Phone</th>
+                    <th>Role</th>
+                    <th>Joined</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for user in users %}
+                <tr>
+                    <td>{{ user.id }}</td>
+                    <td>{{ user.full_name or user.username }}</td>
+                    <td>{{ user.email }}</td>
+                    <td>{{ user.phone or 'N/A' }}</td>
+                    <td><span class="role-badge role-{{ user.role }}">{{ user.role.replace('_', ' ').title() }}</span></td>
+                    <td>{{ user.created_at.strftime('%B %d, %Y') }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
