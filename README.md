@@ -1,4 +1,5 @@
 # 💼 Job Portal - Professional Job Search Platform
+http://127.0.0.1:5000/jobs
 
 [![Owner](https://img.shields.io/badge/Admin-Sadhna-blue?style=flat-square)](https://github.com)
 [![Python](https://img.shields.io/badge/Python-3.11-3776AB?style=flat-square&logo=python&logoColor=white)](https://www.python.org/)
